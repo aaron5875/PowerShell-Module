@@ -20,6 +20,11 @@ function Move-RubrikMountVMDK
       Move-RubrikMountVMDK -SourceVM 'SourceVM' -TargetVM 'TargetVM'
       This will create a Live Mount using the latest snapshot of the VM named "SourceVM"
       The Live Mount's VMDKs would then be presented to the VM named "TargetVM"
+      
+      .EXAMPLE
+      Move-RubrikMountVMDK -SourceVM 'SourceVM' -TargetVM 'TargetVM' -OnlineDisks
+      This will create a Live Mount using the latest snapshot of the VM named "SourceVM"
+      The Live Mount's VMDKs would then be presented to the VM named "TargetVM" and brought online.
 
       .EXAMPLE
       Move-RubrikMountVMDK -SourceVM 'SourceVM' -TargetVM 'TargetVM' -Date '01/30/2016 08:00'
@@ -62,6 +67,10 @@ function Move-RubrikMountVMDK
     # By default, all disks will be presented
     [Parameter(Position = 3,ParameterSetName = 'Create')]
     [Array]$ExcludeDisk,
+    # Boolean value to online disks
+    # All disks will be onlined.
+    [Parameter(Position = 4,ParameterSetName = 'Create')]
+    [Switch]$OnlineDisks,
     # The path to a cleanup file to remove the live mount and presented disks
     # The cleanup file is created each time the command is run and stored in the $HOME path as a text file with a random number value
     # The file contains the TargetVM name, MountID value, and a list of all presented disks
@@ -140,6 +149,11 @@ function Move-RubrikMountVMDK
               $null = New-HardDisk -VM $TargetVM -DiskPath $_.Filename
               $MountedVMdiskFileNames += $_.Filename
               Write-Verbose -Message "Migrated $($_.Filename) to $TargetVM"
+              if ($OnlineDisks)
+			        {
+                Get-Disk | Where-Object IsOffline -Eq $True | Set-Disk -IsOffline $False
+                Write-Verbose -Message 'Onlined attached disks'
+              }
             }
             catch
             {
