@@ -27,6 +27,11 @@
         Write-Verbose -Message 'Loading VMware API data'
         $uri = ('https://'+$Server+$resources.URI.VMware) -replace '{id}', $id
       }
+      'HypervVirtualMachine:::*'
+      {
+        Write-Verbose -Message 'Loading HyperV API data'
+        $uri = ('https://'+$Server+$resources.URI.HyperV) -replace '{id}', $id
+      }
       default
       {
         throw 'The supplied id value has no matching endpoint'
@@ -37,7 +42,7 @@
     return $uri
   }
 
-  Write-Verbose -Message 'Build the query parameters'
+  Write-Verbose -Message "Build the query parameters for $($querykeys -join ',')"
   $querystring = @()
   # Walk through all of the available query options presented by the endpoint
   # Note: Keys are used to search in case the value changes in the future across different API versions

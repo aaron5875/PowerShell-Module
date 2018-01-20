@@ -84,6 +84,18 @@ function Get-RubrikAPIData($endpoint)
         Success     = '200'
       }
     }
+    'Get-RubrikAPIVersion'          = @{
+      v1 = @{
+        Description = 'Retrieves software version of the Rubrik cluster'
+        URI         = '/api/v1/cluster/{id}/api_version'
+        Method      = 'Get'
+        Body        = ''
+        Query       = ''
+        Result      = 'apiVersion'
+        Filter      = ''
+        Success     = '200'
+      }
+    }     
     'Get-RubrikDatabase'         = @{
       v1 = @{
         Description = 'Returns a list of summary information for Microsoft SQL databases.'
@@ -103,6 +115,39 @@ function Get-RubrikAPIData($endpoint)
           'Hostname' = 'rootProperties.rootName'
           'Instance' = 'instanceName'
         }
+        Success     = '200'
+      }
+    }
+    'Get-RubrikDatabaseFiles'         = @{
+      v1 = @{
+        Description = 'Returns a list of files for the database.'
+        URI         = '/api/internal/mssql/db/{id}/restore_files'
+        Method      = 'Get'
+        Body        = ''
+        Query       = @{
+          time = 'time'
+        }
+        Result      = 'data'
+        Filter      = ''
+        Success     = '200'
+      }
+    }
+    'Get-RubrikDatabaseMount'            = @{
+      v1 = @{
+        Description = 'Retrieve information for all live mounts for databases'
+        URI         = '/api/v1/mssql/db/mount'
+        Method      = 'Get'
+        Body        = ''
+        Query       = @{
+          source_database_id = 'source_database_id'
+          source_database_name = 'source_database_name'
+          target_instance_id = 'target_instance_id'
+          mounted_database_name = 'mounted_database_name'
+          offset = 'offset'
+          limit  = 'limit'
+        }
+        Result      = 'data'
+        Filter      = ''
         Success     = '200'
       }
     }
@@ -147,7 +192,7 @@ function Get-RubrikAPIData($endpoint)
         Filter      = ''
         Success     = '200'
       }
-    }
+    }    
     'Get-RubrikHost'             = @{
       v1 = @{
         Description = 'Retrieve summary information for all hosts that are registered with a Rubrik cluster'
@@ -195,6 +240,26 @@ function Get-RubrikAPIData($endpoint)
         Success     = '200'
       }
     }
+    'Get-RubrikReportData'           = @{
+      v1 = @{
+        Description = 'Retrieve table data for a specific report'
+        URI         = '/api/internal/report/{id}/table'
+        Method      = 'Get'
+        Body        = ''
+        Query       = @{
+          search_value = 'search_value'
+          sla_domain_id = 'sla_domain_id'
+          task_type = 'task_type'
+          task_status = 'task_status'
+          object_type = 'object_type'
+          compliance_status = 'compliance_status'
+          cluster_location = 'cluster_location'
+        }
+        Result      = ''
+        Filter      = ''
+        Success     = '200'
+      }
+    }    
     'Get-RubrikRequest'          = @{
       v1 = @{
         Description = 'Get details about an async request.'
@@ -230,6 +295,7 @@ function Get-RubrikAPIData($endpoint)
           Fileset = '/api/v1/fileset/{id}/snapshot'
           MSSQL   = '/api/v1/mssql/db/{id}/snapshot'
           VMware  = '/api/v1/vmware/vm/{id}/snapshot'
+          HyperV  = '/api/internal/hyperv/vm/{id}/snapshot'
         }
         Method      = 'Get'
         Body        = ''
@@ -242,6 +308,48 @@ function Get-RubrikAPIData($endpoint)
         Success     = '200'
       }
     }
+    'Get-RubrikSoftwareVersion'          = @{
+      v1 = @{
+        Description = 'Retrieves software version of the Rubrik cluster'
+        URI         = '/api/v1/cluster/{id}/version'
+        Method      = 'Get'
+        Body        = ''
+        Query       = ''
+        Result      = 'version'
+        Filter      = ''
+        Success     = '200'
+      }
+    }
+    'Get-RubrikSQLInstance'         = @{
+      v1 = @{
+        Description = 'Returns a list of summary information for Microsoft SQL instances.'
+        URI         = '/api/v1/mssql/instance'
+        Method      = 'Get'
+        Body        = ''
+        Query       = @{
+          instance_id             = 'instance_id'
+        }
+        Result      = 'data'
+        Filter      = @{
+          'Name'   = 'name'
+          'SLA'    = 'configuredSlaDomainName'
+          'Hostname' = 'rootProperties.rootName'
+        }
+        Success     = '200'
+      }
+    }
+    'Get-RubrikSupportTunnel' = @{
+      v1 = @{
+        Description = 'To be used by Admin to check status of the support tunnel.'
+        URI         = '/api/internal/node/me/support_tunnel'
+        Method      = 'Get'
+        Body        = ''
+        Query       = ''
+        Result      = ''
+        Filter      = ''
+        Success     = '200'
+      }
+    }     
     'Get-RubrikUnmanagedObject'  = @{
       v1 = @{
         Description = 'Get summary of all the objects with unmanaged snapshots'
@@ -260,7 +368,7 @@ function Get-RubrikAPIData($endpoint)
     }
     'Get-RubrikVersion'          = @{
       v1 = @{
-        Description = 'Retrieves software version of the Rubrik cluster'
+        Description = 'Retrieve public information about the Rubrik cluster'
         URI         = '/api/v1/cluster/{id}'
         Method      = 'Get'
         Body        = ''
@@ -289,6 +397,24 @@ function Get-RubrikAPIData($endpoint)
           'SLA' = 'effectiveSlaDomainName'
         }
         Success     = '200'
+      }
+    }
+    'New-RubrikDatabaseMount'            = @{
+      v1 = @{
+        Description = 'Create a live mount request with given configuration'
+        URI         = '/api/v1/mssql/db/{id}/mount'
+        Method      = 'Post'
+        Body        = @{
+          targetInstanceId     = 'targetInstanceId'
+          mountedDatabaseName  = 'mountedDatabaseName'
+          recoveryPoint = @{
+              timestampMs = 'timestampMs'
+          }
+        }
+        Query       = ''
+        Result      = ''
+        Filter      = ''
+        Success     = '202'
       }
     }
     'New-RubrikHost'             = @{
@@ -325,6 +451,21 @@ function Get-RubrikAPIData($endpoint)
         Success     = '202'
       }
     }
+    'New-RubrikReport'            = @{
+      v1 = @{
+        Description = 'Create a new report by specifying one of the report templates'
+        URI         = '/api/internal/report'
+        Method      = 'Post'
+        Body        = @{
+          name               = 'name'
+          reportTemplate     = 'reportTemplate'
+        }
+        Query       = ''
+        Result      = ''
+        Filter      = ''
+        Success     = '201'
+      }
+    }    
     'New-RubrikSLA'              = @{
       v1 = @{
         Description = 'Create a new SLA Domain on a Rubrik cluster by specifying Domain Rules and policies'
@@ -421,6 +562,20 @@ function Get-RubrikAPIData($endpoint)
         Success     = '200'
       }
     }
+    'Remove-RubrikDatabaseMount'         = @{
+      v1 = @{
+        Description = 'Create a request to delete a database live mount'
+        URI         = '/api/v1/mssql/db/mount/{id}'
+        Method      = 'Delete'
+        Body        = ''
+        Query       = @{
+          force = 'force'
+        }
+        Result      = ''
+        Filter      = ''
+        Success     = '202'
+      }
+    }
     'Remove-RubrikFileset'       = @{
       v1 = @{
         Description = 'Delete a fileset by specifying the fileset ID'
@@ -502,6 +657,24 @@ function Get-RubrikAPIData($endpoint)
         Success     = '200'
       }
     }
+    'Restore-RubrikDatabase' = @{
+      v1 = @{
+        Description = 'Export MSSQL Database from Rubrik to Destination Instance.'
+        URI         = '/api/v1/mssql/db/{id}/restore'
+        Method      = 'Post'
+        Body        = @{
+          recoveryPoint      = @{
+            timestampMs = 'timestampMs'
+          }
+          finishRecovery     = 'finishRecovery'
+          maxDataStreams     = 'maxDataStreams'
+        }
+        Query       = ''
+        Result      = ''
+        Filter      = ''
+        Success     = '202'
+      }
+    }
     'Set-RubrikBlackout'         = @{
       v1 = @{
         Description = 'Whether to start or stop the global blackout window.'
@@ -509,6 +682,24 @@ function Get-RubrikAPIData($endpoint)
         Method      = 'Patch'
         Body        = @{
           isGlobalBlackoutActive = 'isGlobalBlackoutActive'
+        }
+        Query       = ''
+        Result      = ''
+        Filter      = ''
+        Success     = '200'
+      }
+    }
+    'Set-RubrikDatabase'         = @{
+      v1 = @{
+        Description = 'Updates Rubrik database settings.'
+        URI         = '/api/v1/mssql/db/{id}'
+        Method      = 'Patch'
+        Body        = @{
+          logBackupFrequencyInSeconds = "logBackupFrequencyInSeconds"
+          logRetentionHours = "logRetentionHours"
+          copyOnly = "copyOnly"
+          maxDataStreams = "maxDataStreams"
+          configuredSlaDomainId = "configuredSlaDomainId"   
         }
         Query       = ''
         Result      = ''
@@ -530,6 +721,84 @@ function Get-RubrikAPIData($endpoint)
         Success     = '200'
       }
     }
+    'Set-RubrikReport'            = @{
+      v1 = @{
+        Description = 'Update a specific report. The report''s name, chart parameters, filters and table can be updated. If successful, this will automatically trigger an async job to refresh the report content.'
+        URI         = '/api/internal/report/{id}'
+        Method      = 'Patch'
+        Body        = @{
+          name  = 'name'
+          filters = @{
+            slaDomain = 'slaDomain'
+            objects = 'objects'
+            objectType = 'objectType'
+            objectLocation = 'objectLocation'            
+            clusterLocation = 'clusterLocation'
+            taskType = 'taskType'
+            complianceStatus = 'complianceStatus'
+            dateConfig = @{
+              beforeDate = 'beforeDate'
+              afterDate = 'afterDate'
+              period = 'period'
+            }
+          }
+          chart0 = @{
+            id = 'id'
+            name = 'name'
+            chartType = 'chartType'
+            attribute = 'attribute'
+            measure = 'measure' 
+          }
+          chart1 = @{
+            id = 'id'
+            name = 'name'
+            chartType = 'chartType'
+            attribute = 'attribute'
+            measure = 'measure' 
+          }
+          table = @{
+            columns = 'columns'
+          }
+        }
+        Query       = ''
+        Result      = ''
+        Filter      = ''
+        Success     = '200'
+      }
+    }
+    'Set-RubrikSQLInstance'         = @{
+      v1 = @{
+        Description = 'Updates Rubrik database settings.'
+        URI         = '/api/v1/mssql/instance/{id}'
+        Method      = 'Patch'
+        Body        = @{
+          logBackupFrequencyInSeconds = "logBackupFrequencyInSeconds"
+          logRetentionHours = "logRetentionHours"
+          copyOnly = "copyOnly"
+          maxDataStreams = "maxDataStreams"
+          configuredSlaDomainId = "configuredSlaDomainId"   
+        }
+        Query       = ''
+        Result      = ''
+        Filter      = ''
+        Success     = '200'
+      }
+    }
+    'Set-RubrikSupportTunnel'         = @{
+      v1 = @{
+        Description = 'To be used by Admin to open or close a SSH tunnel for support.'
+        URI         = '/api/internal/node/me/support_tunnel'
+        Method      = 'Patch'
+        Body        = @{
+          isTunnelEnabled = "isTunnelEnabled"
+          inactivityTimeoutInSeconds = "inactivityTimeoutInSeconds"
+        }
+        Query       = ''
+        Result      = ''
+        Filter      = ''
+        Success     = '200'
+      }
+    }     
     'Set-RubrikVM'               = @{
       v1 = @{
         Description = 'Update VM with specified properties'

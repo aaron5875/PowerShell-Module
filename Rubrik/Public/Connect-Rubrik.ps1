@@ -101,10 +101,24 @@ function Connect-Rubrik
           'Authorization' = "Basic $auth"
         }      
       }
-
+      
+      #Force TLS 1.2
+      try{
+        if([Net.ServicePointManager]::SecurityProtocol -notlike '*Tls12*'){
+          Write-Verbose -Message 'Adding TLS 1.2'
+          [Net.ServicePointManager]::SecurityProtocol = ([Net.ServicePointManager]::SecurityProtocol).tostring() +', Tls12'
+        }
+      }
+      catch 
+      {
+        Write-Verbose -Message $_
+        Write-Verbose -Message $_.Exception.InnerException.Message
+      }
+      
       Write-Verbose -Message 'Submitting the request'
       try 
       {
+              
         $r = Invoke-WebRequest -Uri $uri -Method $method -Body (ConvertTo-Json -InputObject $body) -Headers $head
         $content = (ConvertFrom-Json -InputObject $r.Content)
         # If we find a successful call code and also a token, we know the request was successful
@@ -121,14 +135,15 @@ function Connect-Rubrik
       }
       catch 
       {
-
+        Write-Verbose -Message $_
+        Write-Verbose -Message $_.Exception.InnerException.Message
       }
     }
     
     # Final throw for when all versions of the API have failed
     if ($content.token -eq $null) 
     {
-      throw 'Unable to connect with any available API version'
+      throw 'Unable to connect with any available API version. Check $Error for details or use the -Verbose parameter.'
     }
 
     # For API version v1.0, use a standard Basic Auth Base64 encoded header with token:$null
@@ -157,13 +172,14 @@ function Connect-Rubrik
 
     Write-Verbose -Message 'Storing all connection details into $global:rubrikConnection'
     $global:rubrikConnection = @{
-      id     = $content.id
-      userId = $content.userId
-      token  = $content.token
-      server = $Server
-      header = $head
-      time   = (Get-Date)
-      api    = $versionnum
+      id      = $content.id
+      userId  = $content.userId
+      token   = $content.token
+      server  = $Server
+      header  = $head
+      time    = (Get-Date)
+      api     = $versionnum
+      version = Get-RubrikSoftwareVersion -Server $Server
     }
         
     Write-Verbose -Message 'Adding connection details into the $global:RubrikConnections array'
